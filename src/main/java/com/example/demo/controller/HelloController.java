@@ -30,24 +30,26 @@ public class HelloController {
         return userService.findAll();
     }
 
-    @PostMapping
-    public ResponseEntity<String> createUser(@RequestBody UserDTO request) {
+    @GetMapping("/{userId}")
+    public UserModel findUserById(@PathVariable UUID userId) {
+        return userService.findUserById(userId);
+    }
 
-        userService.createUser(request);
+    @PostMapping
+    public ResponseEntity<String> createUser(@RequestBody UserDTO userDto) {
+        userService.createUser(userDto);
         return ResponseEntity.ok("User created successfully.");
     }
 
     @PutMapping("/{userId}")
     public ResponseEntity<String> updateUser(@PathVariable UUID userId, @RequestBody UserDTO userDto) {
-
         userService.saveUser(userDto, userId);
         return ResponseEntity.ok("User updated successfully.");
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable UUID id) {
-
-        userService.deleteUserById(id);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable UUID userId) {
+        userService.deleteUserById(userId);
         return ResponseEntity.ok("User deleted successfully.");
     }
 

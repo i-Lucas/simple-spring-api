@@ -27,9 +27,9 @@ public class UserService {
         return userRepository.save(new UserModel(user));
     }
 
-    public UserModel findUserById(UUID id) {
+    public UserModel findUserById(UUID userId) {
 
-        Optional<UserModel> findUserModel = userRepository.findById(id);
+        Optional<UserModel> findUserModel = userRepository.findById(userId);
 
         if (!findUserModel.isPresent()) {
             throw new UserNotFoundException("User not found.");
