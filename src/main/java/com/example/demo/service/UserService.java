@@ -31,21 +31,16 @@ public class UserService {
 
         Optional<UserModel> findUserModel = userRepository.findById(id);
 
-        if (!findUserModel.isPresent())
-            return null;
+        if (!findUserModel.isPresent()) {
+            throw new UserNotFoundException("User not found.");
+        }
 
         return findUserModel.get();
     }
 
     public void saveUser(UserDTO userDto, UUID userId) {
 
-        UserModel findUserModel = this.findUserById(userId);
-
-        if (findUserModel == null) {
-            throw new UserNotFoundException("User not found.");
-        }
-
-        UserModel newUserModel = findUserModel;
+        UserModel newUserModel = this.findUserById(userId);
         BeanUtils.copyProperties(userDto, newUserModel, "id"); // Copia as propriedades, exceto "id"
         userRepository.save(newUserModel);
     }
@@ -53,11 +48,8 @@ public class UserService {
     public void deleteUserById(UUID id) {
 
         UserModel findUserModel = this.findUserById(id);
-
-        if (findUserModel == null) {
-            throw new UserNotFoundException("User not found.");
+        if (findUserModel != null) {
+            userRepository.deleteById(id);
         }
-
-        userRepository.deleteById(id);
     }
 }
