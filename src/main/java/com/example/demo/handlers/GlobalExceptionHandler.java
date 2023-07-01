@@ -1,8 +1,9 @@
 package com.example.demo.handlers;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,13 +11,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException exception) {
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleException(Exception exception) {
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("message", exception.getMessage());
-        return ResponseEntity.status(exception.getStatus()).body(responseBody);
+        return ResponseEntity.status(this.getStatus(exception)).body(responseBody);
     }
 
-    // Adicione outros métodos para tratar diferentes exceções, se necessário
+    private HttpStatus getStatus(Exception exception) {
+
+        if (exception instanceof UserNotFoundException) {
+            return ((UserNotFoundException) exception).getStatus();
+
+        } else if (exception instanceof EmailAlreadyRegisteredException) {
+            return ((EmailAlreadyRegisteredException) exception).getStatus();
+        }
+
+        return HttpStatus.INTERNAL_SERVER_ERROR; // não mapeado
+    }
 }
