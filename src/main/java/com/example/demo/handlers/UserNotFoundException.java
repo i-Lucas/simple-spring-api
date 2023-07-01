@@ -11,6 +11,4 @@ public class UserNotFoundException extends RuntimeException {
     public HttpStatus getStatus() {
         return HttpStatus.NOT_FOUND;
     }
-
-    // Adicione outros construtores, se necessário
 }

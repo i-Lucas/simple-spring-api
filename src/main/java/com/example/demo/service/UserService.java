@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.model.UserModel;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.handlers.EmailAlreadyRegisteredException;
 import com.example.demo.handlers.UserNotFoundException;
 
 @Service
@@ -29,8 +30,24 @@ public class UserService {
         return userRepository.findAll(pageable);
     }
 
-    public UserModel createUser(UserDTO user) {
-        return userRepository.save(new UserModel(user));
+    public UserModel findUserByEmail(String email) {
+
+        UserModel user = userRepository.findByEmail(email);
+
+        if (user != null) {
+            throw new EmailAlreadyRegisteredException("E-mail already registered.");
+        }
+        return user;
+    }
+
+    public UserModel createUser(UserDTO newUser) {
+
+        UserModel user = userRepository.findByEmail(newUser.email());
+
+        if (user != null) {
+            throw new EmailAlreadyRegisteredException("E-mail already registered.");
+        }
+        return userRepository.save(new UserModel(newUser));
     }
 
     public UserModel findUserById(UUID userId) {
@@ -44,18 +61,21 @@ public class UserService {
         return findUserModel.get();
     }
 
-    public void saveUser(UserDTO userDto, UUID userId) {
+    public void updateUser(UserDTO userDto, UUID userId) {
 
         UserModel newUserModel = this.findUserById(userId);
         BeanUtils.copyProperties(userDto, newUserModel, "id"); // Copia as propriedades, exceto "id"
         userRepository.save(newUserModel);
     }
 
-    public void deleteUserById(UUID id) {
+    public void deleteUserById(UUID userId) {
 
-        UserModel findUserModel = this.findUserById(id);
-        if (findUserModel != null) {
-            userRepository.deleteById(id);
+        Optional<UserModel> findUserModel = userRepository.findById(userId);
+
+        if (!findUserModel.isPresent()) {
+            throw new UserNotFoundException("User not found.");
         }
+
+        userRepository.deleteById(userId);
     }
 }
