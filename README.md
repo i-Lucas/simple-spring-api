@@ -1,1 +1,1 @@
-# aceleracao-driven-spring
+# simple-spring-api
