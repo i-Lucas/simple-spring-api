@@ -48,7 +48,7 @@ public class HelloController {
 
     @PutMapping("/{userId}")
     public ResponseEntity<String> updateUser(@PathVariable UUID userId, @RequestBody UserDTO userDto) {
-        userService.saveUser(userDto, userId);
+        userService.updateUser(userDto, userId);
         return ResponseEntity.ok("User updated successfully.");
     }
 
