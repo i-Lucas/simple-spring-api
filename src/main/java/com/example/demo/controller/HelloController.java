@@ -30,7 +30,7 @@ public class HelloController {
     private UserService userService;
 
     @GetMapping
-    public Page<UserModel> getUsers(@PageableDefault(page = 0, size = 2) Pageable page) {
+    public Page<UserModel> getUsers(@PageableDefault(page = 0, size = 10) Pageable page) {
         return userService.findAll(page);
     }
 
