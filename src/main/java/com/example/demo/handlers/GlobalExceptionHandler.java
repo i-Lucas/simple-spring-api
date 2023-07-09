@@ -16,6 +16,7 @@ public class GlobalExceptionHandler {
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("message", exception.getMessage());
+        responseBody.put("status", this.getStatus(exception));
         return ResponseEntity.status(this.getStatus(exception)).body(responseBody);
     }
 
