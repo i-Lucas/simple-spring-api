@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.demo.dto.UserDTO;
+import com.example.demo.handlers.exceptions.InvalidUUID;
 import com.example.demo.model.UserModel;
 import com.example.demo.service.UserService;
 
@@ -28,6 +29,7 @@ public class HelloController {
 
     @Autowired
     private UserService userService;
+    private UUID uuId;
 
     @GetMapping
     public Page<UserModel> getUsers(@PageableDefault(page = 0, size = 10) Pageable page) {
@@ -35,8 +37,16 @@ public class HelloController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserModel> findUserById(@PathVariable UUID userId) {
-        UserModel user = userService.findUserById(userId);
+    public ResponseEntity<UserModel> findUserById(@PathVariable String userId) throws InvalidUUID {
+
+        try {
+            uuId = UUID.fromString(userId);
+            
+        } catch (IllegalArgumentException e) {
+            throw new InvalidUUID();
+        }
+
+        UserModel user = userService.findUserById(uuId);
         return ResponseEntity.ok().body(user);
     }
 
