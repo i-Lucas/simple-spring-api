@@ -1,33 +1,32 @@
 package com.example.demo.handlers;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.example.demo.handlers.exceptions.IExceptionStatusMapping;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleException(Exception exception) {
+    private Map<String, Object> responseBody = new HashMap<>();
 
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("message", exception.getMessage());
-        responseBody.put("status", this.getStatus(exception));
-        return ResponseEntity.status(this.getStatus(exception)).body(responseBody);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleException(Exception exception) {
+
+        HttpStatus status = this.getStatus(exception);
+        responseBody.putAll(Map.of("message", exception.getMessage(), "status", status));
+        return new ResponseEntity<>(responseBody, status);
     }
 
     private HttpStatus getStatus(Exception exception) {
 
-        if (exception instanceof UserNotFoundException) {
-            return ((UserNotFoundException) exception).getStatus();
-
-        } else if (exception instanceof EmailAlreadyRegisteredException) {
-            return ((EmailAlreadyRegisteredException) exception).getStatus();
-        }
+        if (exception instanceof IExceptionStatusMapping)
+            return ((IExceptionStatusMapping) exception).getStatus();
 
         return HttpStatus.INTERNAL_SERVER_ERROR; // não mapeado
     }

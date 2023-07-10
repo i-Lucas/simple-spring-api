@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.model.UserModel;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.handlers.EmailAlreadyRegisteredException;
-import com.example.demo.handlers.UserNotFoundException;
+import com.example.demo.handlers.exceptions.UserNotFound;
+import com.example.demo.handlers.exceptions.EmailAlreadyRegistered;
 
 @Service
 public class UserService {
@@ -35,7 +35,7 @@ public class UserService {
         UserModel user = userRepository.findByEmail(email);
 
         if (user != null) {
-            throw new EmailAlreadyRegisteredException("E-mail already registered.");
+            throw new EmailAlreadyRegistered();
         }
         return user;
     }
@@ -45,7 +45,7 @@ public class UserService {
         UserModel user = userRepository.findByEmail(newUser.email());
 
         if (user != null) {
-            throw new EmailAlreadyRegisteredException("E-mail already registered.");
+            throw new EmailAlreadyRegistered();
         }
         return userRepository.save(new UserModel(newUser));
     }
@@ -55,7 +55,7 @@ public class UserService {
         Optional<UserModel> findUserModel = userRepository.findById(userId);
 
         if (!findUserModel.isPresent()) {
-            throw new UserNotFoundException("User not found.");
+            throw new UserNotFound();
         }
 
         return findUserModel.get();
@@ -64,7 +64,7 @@ public class UserService {
     public void updateUser(UserDTO userDto, UUID userId) {
 
         UserModel newUserModel = this.findUserById(userId);
-        BeanUtils.copyProperties(userDto, newUserModel, "id"); // Copia as propriedades, exceto "id"
+        BeanUtils.copyProperties(userDto, newUserModel, "id");
         userRepository.save(newUserModel);
     }
 
@@ -73,7 +73,7 @@ public class UserService {
         Optional<UserModel> findUserModel = userRepository.findById(userId);
 
         if (!findUserModel.isPresent()) {
-            throw new UserNotFoundException("User not found.");
+            throw new UserNotFound();
         }
 
         userRepository.deleteById(userId);
